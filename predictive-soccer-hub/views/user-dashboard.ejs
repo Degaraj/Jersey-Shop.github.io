@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>User Dashboard</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body class="dark">
+
+<div class="app-layout">
+
+  <aside class="sidebar">
+    <div class="brand">⚽ Soccer Hub</div>
+    <a class="active" href="/user/dashboard">Dashboard</a>
+    <a href="/user/predictions">Predictions</a>
+    <a href="/user/payment">Subscription</a>
+    <a href="/logout">Logout</a>
+  </aside>
+
+  <main class="main-content">
+    <div class="topbar">
+      <div>
+        <h1>Welcome, <%= user.fullName %></h1>
+        <p>Premium football prediction dashboard</p>
+      </div>
+      <a href="/logout" class="btn danger">Logout</a>
+    </div>
+
+    <div class="stats-grid">
+  <div class="stat-card">
+    <span>Subscription</span>
+    <h2><%= user.subscriptionStatus %></h2>
+  </div>
+
+  <div class="stat-card">
+    <span>Payment Status</span>
+    <h2><%= payment ? payment.payment_status : "None" %></h2>
+  </div>
+
+  <div class="stat-card">
+    <span>Total Predictions</span>
+    <h2><%= predictionCount %></h2>
+  </div>
+
+  <div class="stat-card">
+    <span>Total Correct</span>
+    <h2><%= totalCorrect %>/<%= totalFinished %></h2>
+  </div>
+
+  <div class="stat-card premium-stat">
+    <span>Prediction Win Rate</span>
+    <h2><%= winRate %>%</h2>
+  </div>
+</div>
+
+    <div class="glass-card">
+      <h2>Subscription Details</h2>
+
+      <% if (isPaidUser) { %>
+        <p class="approved">Your premium subscription is active.</p>
+        <p>Expiry Date: <%= new Date(user.subscriptionExpiry).toDateString() %></p>
+      <% } else { %>
+        <p class="pending">Your subscription is inactive or expired.</p>
+        <a href="/user/payment" class="btn">Upgrade Now</a>
+      <% } %>
+
+      <% if (payment && payment.payment_status === "Rejected") { %>
+        <p class="rejected">Payment Rejected</p>
+        <p>Reason: <%= payment.rejection_reason || "No reason provided" %></p>
+      <% } %>
+    </div>
+
+    <div class="glass-card">
+      <h2>Payment History</h2>
+
+      <table class="admin-table">
+        <tr>
+          <th>Plan</th>
+          <th>Amount</th>
+          <th>Status</th>
+          <th>Date</th>
+          <th>Proof</th>
+        </tr>
+
+        <% payments.forEach(payment => { %>
+          <tr>
+            <td><%= payment.plan_id ? payment.plan_id.name : "N/A" %></td>
+            <td>$<%= payment.payment_amount %></td>
+            <td><span class="<%= payment.payment_status.toLowerCase() %>"><%= payment.payment_status %></span></td>
+            <td><%= new Date(payment.createdAt).toLocaleString() %></td>
+            <td><a href="<%= payment.payment_screenshot %>" target="_blank">View</a></td>
+          </tr>
+        <% }) %>
+      </table>
+    </div>
+  </main>
+</div>
+
+</body>
+</html>

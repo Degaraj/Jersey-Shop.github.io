@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Binance Payment</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body class="dark">
+
+<div class="container">
+  <div class="glass-card">
+    <h1>Binance Pay Subscription</h1>
+
+    <form action="/user/payment" method="POST" enctype="multipart/form-data">
+
+      <label>Select Plan</label>
+      <select name="plan_id" required>
+        <% plans.forEach(plan => { %>
+          <option value="<%= plan._id %>">
+            <%= plan.name %> — $<%= plan.price %>
+          </option>
+        <% }) %>
+      </select>
+
+      <div class="qr-box">
+        <h3>Pay using Binance Pay</h3>
+        <img src="/binance-qr.png" class="qr-img">
+      </div>
+
+      <label>Wallet Address</label>
+      <div class="wallet-box">
+        <input type="text" id="wallet" value="<%= wallet %>" readonly>
+        <button type="button" onclick="copyWallet()">Copy</button>
+      </div>
+
+      <label>Upload Payment Screenshot</label>
+      <input type="file" name="payment_screenshot" accept=".jpg,.jpeg,.png,.webp" required>
+
+      <button type="submit" class="binance-btn">
+        Submit Payment Proof
+      </button>
+    </form>
+  </div>
+</div>
+
+<script>
+function copyWallet() {
+  const wallet = document.getElementById("wallet");
+  wallet.select();
+  document.execCommand("copy");
+  alert("Wallet address copied");
+}
+</script>
+
+</body>
+</html>

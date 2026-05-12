@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Predictions</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body class="dark">
+
+<div class="app-layout">
+
+  <aside class="sidebar">
+    <div class="brand">⚽ Soccer Hub</div>
+    <a href="/user/dashboard">Dashboard</a>
+    <a class="active" href="/user/predictions">Predictions</a>
+    <a href="/user/payment">Subscription</a>
+    <a href="/logout">Logout</a>
+  </aside>
+
+  <main class="main-content">
+    <div class="topbar">
+      <div>
+        <h1>Game Predictions</h1>
+        <p>
+          <% if (isPaidUser) { %>
+            Premium analysis unlocked
+          <% } else { %>
+            Free users can view ratio only
+          <% } %>
+        </p>
+      </div>
+
+      <% if (!isPaidUser) { %>
+        <a href="/user/payment" class="btn">Upgrade</a>
+      <% } %>
+    </div>
+
+    <div class="prediction-grid">
+      <% predictions.forEach(prediction => { %>
+        <div class="prediction-card">
+          <div class="card-header">
+            <span class="badge"><%= prediction.category %></span>
+            <span class="result-badge"><%= prediction.resultStatus %></span>
+          </div>
+
+          <h2><%= prediction.matchName %></h2>
+          <p><strong>League:</strong> <%= prediction.league %></p>
+          <p><strong>Date:</strong> <%= new Date(prediction.matchDate).toLocaleString() %></p>
+
+
+          <% if (isPaidUser) { %>
+            <p><strong>Predicted Winner:</strong> <%= prediction.predictedWinner %></p>
+            <p><strong>Predicted Score:</strong> <%= prediction.predictedScore %></p>
+
+            <div class="analysis-box">
+              <h3>Admin Analysis</h3>
+              <p><%= prediction.analysis %></p>
+            </div>
+          <% } else { %>
+            <div class="premium-blur">
+              <p>Predicted Winner: Locked</p>
+              <p>Predicted Score: Locked</p>
+              <p>Full Analysis: Locked</p>
+            </div>
+
+            <div class="locked-box">
+              🔒 Premium Analysis Locked
+              <br>
+              <a href="/user/payment">Upgrade to unlock full prediction</a>
+            </div>
+          <% } %>
+        </div>
+      <% }) %>
+    </div>
+
+    <div class="glass-card feedback-section">
+      <h2>User Feedback</h2>
+
+      <% if (isPaidUser) { %>
+        <form action="/user/feedback/add" method="POST">
+          <label>Rating</label>
+          <select name="rating" required>
+            <option value="5">⭐⭐⭐⭐⭐ Excellent</option>
+            <option value="4">⭐⭐⭐⭐ Good</option>
+            <option value="3">⭐⭐⭐ Average</option>
+            <option value="2">⭐⭐ Poor</option>
+            <option value="1">⭐ Bad</option>
+          </select>
+
+          <label>Feedback</label>
+          <textarea name="message" placeholder="Write your feedback..." required></textarea>
+
+          <button type="submit">Submit Feedback</button>
+        </form>
+      <% } else { %>
+        <p class="pending">Only paid users can give feedback. You can still view feedback below.</p>
+      <% } %>
+
+      <div class="feedback-list">
+        <% feedbacks.forEach(feedback => { %>
+          <div class="feedback-card">
+            <strong><%= feedback.user_id.fullName %></strong>
+            <div class="stars">
+              <% for(let i = 0; i < feedback.rating; i++) { %>⭐<% } %>
+            </div>
+            <p><%= feedback.message %></p>
+            <small><%= new Date(feedback.createdAt).toLocaleString() %></small>
+          </div>
+        <% }) %>
+      </div>
+    </div>
+  </main>
+</div>
+<div class="stats-grid">
+  <div class="stat-card">
+    <span>Total Finished Predictions</span>
+    <h2><%= totalFinished %></h2>
+  </div>
+
+  <div class="stat-card">
+    <span>Total Correct Predictions</span>
+    <h2><%= totalCorrect %></h2>
+  </div>
+
+  <div class="stat-card premium-stat">
+    <span>Overall Win Rate</span>
+    <h2><%= winRate %>%</h2>
+  </div>
+</div>
+
+</body>
+</html>

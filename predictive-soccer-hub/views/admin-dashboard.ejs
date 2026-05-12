@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Admin Dashboard</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body class="dark">
+
+<div class="app-layout">
+
+  <aside class="sidebar">
+    <div class="brand">⚽ Admin Panel</div>
+    <a class="active" href="/admin/dashboard">Payments</a>
+    <a href="/admin/predictions">Predictions</a>
+    <a href="/logout">Logout</a>
+  </aside>
+
+  <main class="main-content">
+    <div class="topbar">
+      <div>
+        <h1>Payment Verification</h1>
+        <p>Approve Binance Pay screenshot uploads</p>
+      </div>
+      <a href="/admin/predictions" class="btn">Manage Predictions</a>
+    </div>
+    <div class="stat-card"><span>Total Correct</span><h2><%= stats.totalCorrect %>/<%= stats.totalFinished %></h2></div>
+<div class="stat-card"><span>Win Rate</span><h2><%= stats.winRate %>%</h2></div>
+    <div class="stats-grid">
+      <div class="stat-card"><span>Total Users</span><h2><%= stats.totalUsers %></h2></div>
+      <div class="stat-card"><span>Paid Users</span><h2><%= stats.paidUsers %></h2></div>
+      <div class="stat-card"><span>Pending Payments</span><h2><%= stats.pendingPayments %></h2></div>
+      <div class="stat-card"><span>Approved</span><h2><%= stats.approvedPayments %></h2></div>
+      <div class="stat-card"><span>Rejected</span><h2><%= stats.rejectedPayments %></h2></div>
+      <div class="stat-card"><span>Predictions</span><h2><%= stats.totalPredictions %></h2></div>
+      <div class="stat-card"><span>Feedback</span><h2><%= stats.totalFeedback %></h2></div>
+    </div>
+
+    <div class="glass-card">
+      <h2>Payment Requests</h2>
+
+      <table class="admin-table">
+        <tr>
+          <th>Avatar</th>
+          <th>User Info</th>
+          <th>Plan</th>
+          <th>Amount</th>
+          <th>Screenshot</th>
+          <th>Date</th>
+          <th>Status</th>
+          <th>Payment ID</th>
+          <th>Actions</th>
+        </tr>
+
+        <% payments.forEach(payment => { %>
+          <tr>
+            <td>
+              <img src="<%= payment.user_id.avatar %>" class="avatar">
+            </td>
+
+            <td>
+              <strong><%= payment.user_id.fullName %></strong><br>
+              <%= payment.user_id.email %><br>
+              User ID: <%= payment.user_id._id %><br>
+              Joined: <%= new Date(payment.user_id.createdAt).toDateString() %><br>
+              Subscription: <%= payment.user_id.subscriptionStatus %>
+            </td>
+
+            <td><%= payment.plan_id ? payment.plan_id.name : "N/A" %></td>
+            <td>$<%= payment.payment_amount %></td>
+
+            <td>
+              <img src="<%= payment.payment_screenshot %>" class="proof-img"><br>
+              <a href="<%= payment.payment_screenshot %>" target="_blank">View Screenshot</a>
+            </td>
+
+            <td><%= new Date(payment.createdAt).toLocaleString() %></td>
+
+            <td>
+              <span class="<%= payment.payment_status.toLowerCase() %>">
+                <%= payment.payment_status %>
+              </span>
+            </td>
+
+            <td><%= payment._id %></td>
+
+            <td>
+              <% if (payment.payment_status === "Pending") { %>
+                <form action="/admin/approve/<%= payment._id %>" method="POST">
+                  <button class="approve-btn">Approve</button>
+                </form>
+
+                <form action="/admin/reject/<%= payment._id %>" method="POST">
+                  <input name="rejection_reason" placeholder="Reason optional">
+                  <button class="reject-btn">Reject</button>
+                </form>
+              <% } %>
+
+              <form action="/admin/delete/<%= payment._id %>" method="POST">
+                <button class="delete-btn">Delete</button>
+              </form>
+            </td>
+          </tr>
+        <% }) %>
+      </table>
+    </div>
+  </main>
+</div>
+
+</body>
+</html>
